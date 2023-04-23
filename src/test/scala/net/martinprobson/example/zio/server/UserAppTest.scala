@@ -12,7 +12,7 @@ import zio.test.Assertion.*
 
 object UserAppTest extends ZIOTestApplication:
 
-  private val app = UserApp().withDefaultErrorResponse
+  private val app = UserApp()
 
   def spec = suiteAll("UserAppTest") {
     val users = Range(1, 20).inclusive.toList
@@ -24,7 +24,7 @@ object UserAppTest extends ZIOTestApplication:
       val path = !! / "user"
       val req =
         Request.post(body = Body.fromString(user.toJson), url = URL(path))
-      for actualBody <- app(req).flatMap(_.body.asString)
+      for actualBody <- app.runZIO(req).flatMap(_.body.asString)
       yield assertTrue(actualBody.fromJson[User] == Right(user.copy(id = 1)))
     }
 
@@ -32,7 +32,7 @@ object UserAppTest extends ZIOTestApplication:
       val path = !! / "users"
       val req =
         Request.post(body = Body.fromString(users.toJson), url = URL(path))
-      for actualBody <- app(req).flatMap(_.body.asString)
+      for actualBody <- app.runZIO(req).flatMap(_.body.asString)
       yield assert(actualBody.fromJson[List[User]])(
         isRight(hasSize(equalTo(users.size)))
       )
@@ -40,7 +40,8 @@ object UserAppTest extends ZIOTestApplication:
 
     test("getUsers - empty") {
       val path = !! / "users"
-      app(Request.get(url = URL(path)))
+      app
+        .runZIO(Request.get(url = URL(path)))
         .flatMap(_.body.asString)
         .flatMap(body =>
           assert(body.fromJson[List[User]])(isRight(hasSize(equalTo(0))))
@@ -53,8 +54,8 @@ object UserAppTest extends ZIOTestApplication:
       val addUsersReq =
         Request.post(body = Body.fromString(users.toJson), url = URL(path))
       for
-        _ <- app(addUsersReq)
-        actualBody <- app(req).flatMap(_.body.asString)
+        _ <- app.runZIO(addUsersReq)
+        actualBody <- app.runZIO(req).flatMap(_.body.asString)
       yield assert(actualBody.fromJson[List[User]])(
         isRight(hasSize(equalTo(users.size)))
       )
@@ -69,8 +70,8 @@ object UserAppTest extends ZIOTestApplication:
           url = URL(!! / "users")
         )
       for
-        _ <- app(addUsersReq)
-        actualBody <- app(req).flatMap(_.body.asString)
+        _ <- app.runZIO(addUsersReq)
+        actualBody <- app.runZIO(req).flatMap(_.body.asString)
       yield assert(actualBody.fromJson[User])(
         isRight(hasField("id", _.id, equalTo(4)))
       )
@@ -79,14 +80,14 @@ object UserAppTest extends ZIOTestApplication:
     test("getUser - (user does not exist)") {
       val path = !! / "user" / "4"
       val req = Request.get(url = URL(path))
-      for resp <- app(req)
+      for resp <- app.runZIO(req)
       yield assertTrue(resp.status == Status.NotFound)
     }
 
     test("count users - (empty database)") {
       val path = !! / "users" / "count"
       val req = Request.get(url = URL(path))
-      for actualBody <- app(req).flatMap(_.body.asString)
+      for actualBody <- app.runZIO(req).flatMap(_.body.asString)
       yield assert(actualBody)(equalTo("0"))
     }
 
@@ -99,8 +100,8 @@ object UserAppTest extends ZIOTestApplication:
           url = URL(!! / "users")
         )
       for
-        _ <- app(addUsersReq)
-        actualBody <- app(req).flatMap(_.body.asString)
+        _ <- app.runZIO(addUsersReq)
+        actualBody <- app.runZIO(req).flatMap(_.body.asString)
       yield assert(actualBody)(equalTo(users.size.toString))
     }
 //TODO test for count
