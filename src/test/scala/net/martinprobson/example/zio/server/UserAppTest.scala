@@ -6,14 +6,13 @@ import net.martinprobson.example.zio.repository.InMemoryUserRepository
 import net.martinprobson.example.zio.server.UserAppTest.{suiteAll, test}
 import zio.ZIO
 import zio.http.*
-import zio.http.model.*
 import zio.json.*
 import zio.test.*
 import zio.test.Assertion.*
 
 object UserAppTest extends ZIOTestApplication:
 
-  private val app = UserApp()
+  private val app = UserApp().withDefaultErrorResponse
 
   def spec = suiteAll("UserAppTest") {
     val users = Range(1, 20).inclusive.toList

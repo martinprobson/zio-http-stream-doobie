@@ -3,27 +3,22 @@ package net.martinprobson.example.zio.server
 import zio.*
 import zio.http.*
 import net.martinprobson.example.zio.common.ZIOApplication
-import net.martinprobson.example.zio.repository.{InMemoryUserRepository, UserRepository}
-import zio.http.ServerConfig.LeakDetectionLevel
+import net.martinprobson.example.zio.repository.{
+  InMemoryUserRepository,
+  UserRepository
+}
+//import zio.http.ServerConfig.LeakDetectionLevel
 
 object UserServer extends ZIOApplication:
 
-  private val port = 8085
-
-  private val config = ServerConfig
-    .default
-    .port(port)
-    .maxThreads(100)
-    .keepAlive(false)
-    .leakDetection(LeakDetectionLevel.PARANOID)
-
   private def program: RIO[UserRepository, Unit] = for
-    _ <- ZIO.logInfo(s"Starting server on port: $port")
+    _ <- ZIO.logInfo(s"Starting server ")
     server <- Server
-      .serve(UserApp())
+      .serve(UserApp().withDefaultErrorResponse)
+      .flatMap(port => ZIO.logInfo(s"Server start on port: $port"))
       .provideSome[UserRepository](
-        ServerConfig.live(config),
-        Server.live
+        Server.live,
+        ZLayer.succeed(Server.Config.default.port(8085))
       )
       .fork
     _ <- Console.readLine("Press enter to stop the server\n")

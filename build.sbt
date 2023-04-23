@@ -13,7 +13,7 @@ lazy val root = (project in file("."))
     "dev.zio" %% "zio-logging" % "2.1.10",
     "dev.zio" %% "zio-logging-slf4j" % "2.1.10",
     // zio http
-    "dev.zio" %% "zio-http" % "0.0.3",
+    "dev.zio" %% "zio-http" % "3.0.0-RC1",
     "dev.zio" %% "zio-json" % "0.4.2",
     // zio Config
     "dev.zio" %% "zio-config" % "4.0.0-RC12",
@@ -31,15 +31,15 @@ lazy val root = (project in file("."))
   )
 )
 
-//scalacOptions ++= Seq(
-//  "-deprecation",         // Emit warning and location for usages of deprecated APIs.
-//  "-explaintypes",        // Explain type errors in more detail.
-//  "-explain",
-////  "-Xfatal-warnings",     // Fail the compilation if there are any warnings.
-////  "-encoding",
-////  "utf8",
-////  "-Yretain-trees"        // This is needed for zio-json (see https://github.com/zio/zio-json/issues/779)
-//)
+scalacOptions ++= Seq(
+  "-deprecation",         // Emit warning and location for usages of deprecated APIs.
+  "-explaintypes",        // Explain type errors in more detail.
+  "-explain",
+  "-Xfatal-warnings",     // Fail the compilation if there are any warnings.
+  "-encoding",
+  "utf8",
+  "-Yretain-trees"        // This is needed for zio-json (see https://github.com/zio/zio-json/issues/779)
+)
 
 testFrameworks += new TestFramework("zio.test.sbt.ZTestFramework")
 

@@ -2,7 +2,7 @@ package net.martinprobson.example.zio.server
 
 import zio.*
 import zio.http.*
-import zio.http.model.*
+//import zio.http.model.*
 import zio.json.*
 
 import net.martinprobson.example.zio.common.{User, USER_ID, UserName}
@@ -19,7 +19,7 @@ object UserApp:
             case Left(e) =>
               ZIO
                 .debug(s"Failed to parse input: $e")
-                .as(Response.text(e).setStatus(Status.BadRequest))
+                .as(Response.text(e).withStatus(Status.BadRequest))
             case Right(users) =>
               UserRepository
                 .addUsers(users)
@@ -33,7 +33,7 @@ object UserApp:
               ZIO
                 .debug(s"Failed to parse the input: $e")
                 .as(
-                  Response.text(e).setStatus(Status.BadRequest)
+                  Response.text(e).withStatus(Status.BadRequest)
                 )
             case Right(u) =>
               UserRepository
@@ -52,7 +52,7 @@ object UserApp:
               ZIO
                 .debug(s"Failed to parse the input: $e")
                 .as(
-                  Response.text(e.toString).setStatus(Status.BadRequest)
+                  Response.text(e.toString).withStatus(Status.BadRequest)
                 )
             case Right(u) =>
               UserRepository
