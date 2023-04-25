@@ -1,9 +1,13 @@
 package net.martinprobson.example.zio.common
 
-import zio.{ZIOAppDefault, ZLayer, ZIOAppArgs, Runtime}
+import zio.config.typesafe.TypesafeConfigProvider
+import zio.{ConfigProvider, Runtime, ZIOAppArgs, ZIOAppDefault, ZLayer}
 import zio.logging.*
 import zio.logging.LogFormat.*
 import zio.logging.backend.SLF4J
+import zio.config.*
+import zio.config.magnolia.*
+import zio.config.typesafe.*
 
 trait ZIOApplication extends ZIOAppDefault {
 
@@ -17,9 +21,14 @@ trait ZIOApplication extends ZIOAppDefault {
       LogFormat.line +
       LogFormat.cause
 
-  /** Remove the default logger and replace with our slf4j custom log format.
+  /** Configure the runtime: -
+    *
+    * <ul>
+    * <li>Remove the default logger and replace with our slf4j custom log format.</li>
+    * <li>Set the default config provider to be typesafe config.</li>
+    * </ul>
     */
   override val bootstrap: ZLayer[ZIOAppArgs, Any, Any] =
-    // Runtime.removeDefaultLoggers >>> SLF4J.slf4j(LogFormat.colored)
-    Runtime.removeDefaultLoggers >>> SLF4J.slf4j(logFormat)
+    Runtime.removeDefaultLoggers >>> SLF4J.slf4j(logFormat) >>>
+      Runtime.setConfigProvider(TypesafeConfigProvider.fromResourcePath)
 }

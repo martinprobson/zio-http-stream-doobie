@@ -21,7 +21,7 @@ object Main extends ZIOApplication:
   val program: ZIO[UserClient & Source, Throwable, Unit] =
     // FileSource.stream.mapZIOParUnordered(4)(user => UserClient.addUser(user)).runDrain
     Source.stream
-      .mapZIOParUnordered(40)(user => UserClient.addUser(user))
+      .mapZIOParUnordered(Int.MaxValue)(user => UserClient.addUser(user))
       .runDrain
 
   override def run: Task[Unit] = program.provide(
