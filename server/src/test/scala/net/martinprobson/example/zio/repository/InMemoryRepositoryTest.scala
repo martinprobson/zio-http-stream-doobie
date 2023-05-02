@@ -1,17 +1,19 @@
 package net.martinprobson.example.zio.repository
 
-
 import zio.ZIO
 import zio.test.*
 import net.martinprobson.example.zio.ZIOTestApplication
-import net.martinprobson.example.zio.common.{Email, User, UserName}
-import net.martinprobson.example.zio.repository.{InMemoryUserRepository, UserRepository}
+import net.martinprobson.example.zio.common.User
+import net.martinprobson.example.zio.repository.{
+  InMemoryUserRepository,
+  UserRepository
+}
 
 object InMemoryRepositoryTest extends ZIOTestApplication:
 
   def spec = suiteAll("InMemoryRepositoryTest") {
     val users = Range(1, 20).inclusive.toList
-      .map { i => User(UserName(s"User-$i"), Email(s"email-$i")) }
+      .map { i => User(s"User-$i", s"email-$i") }
 
     val user = users.head
 
@@ -29,7 +31,7 @@ object InMemoryRepositoryTest extends ZIOTestApplication:
         u <- UserRepository.addUser(user)
         c <- UserRepository.countUsers
       yield assertTrue(
-        c == 1 && u.name == UserName("User-1") && u.email == Email("email-1")
+        c == 1 && u.name == "User-1" && u.email == "email-1"
       )
     }
     test("addUsers") {
@@ -41,20 +43,20 @@ object InMemoryRepositoryTest extends ZIOTestApplication:
     test("getUserByName (1 match)") {
       for
         _ <- UserRepository.addUsers(users)
-        u <- UserRepository.getUserByName(UserName("User-5"))
-      yield assertTrue(u.size == 1 && u.head.name == UserName("User-5"))
+        u <- UserRepository.getUserByName("User-5")
+      yield assertTrue(u.size == 1 && u.head.name == "User-5")
     }
     test("getUserByName (> 1 match)") {
       for
         _ <- UserRepository.addUsers(users)
         _ <- UserRepository.addUsers(users)
-        u <- UserRepository.getUserByName(UserName("User-5"))
-      yield assertTrue(u.filter(u => u.name == UserName("User-5")).size == 2)
+        u <- UserRepository.getUserByName("User-5")
+      yield assertTrue(u.filter(u => u.name == "User-5").size == 2)
     }
     test("getUserByName (no match)") {
       for
         _ <- UserRepository.addUsers(users)
-        u <- UserRepository.getUserByName(UserName("zzzz"))
+        u <- UserRepository.getUserByName("zzzz")
       yield assertTrue(u.isEmpty)
     }
     test("getUsers (non-empty database)") {
@@ -70,7 +72,7 @@ object InMemoryRepositoryTest extends ZIOTestApplication:
       for
         _ <- UserRepository.addUsers(users)
         u <- UserRepository.getUser(6)
-      yield assertTrue(u == Some(User(6, UserName("User-6"), Email("email-6"))))
+      yield assertTrue(u == Some(User(6, "User-6", "email-6")))
     }
     test("getUser (user does not exist)") {
       for

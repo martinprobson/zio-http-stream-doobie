@@ -1,7 +1,7 @@
 package net.martinprobson.example.zio.server
 
 import net.martinprobson.example.zio.ZIOTestApplication
-import net.martinprobson.example.zio.common.{Email, User, UserName}
+import net.martinprobson.example.zio.common.User
 import net.martinprobson.example.zio.repository.InMemoryUserRepository
 import net.martinprobson.example.zio.server.UserAppTest.{suiteAll, test}
 import zio.ZIO
@@ -16,7 +16,7 @@ object UserAppTest extends ZIOTestApplication:
 
   def spec = suiteAll("UserAppTest") {
     val users = Range(1, 20).inclusive.toList
-      .map { i => User(UserName(s"User-$i"), Email(s"email-$i")) }
+      .map { i => User(s"User-$i", s"email-$i") }
 
     val user = users.head
 

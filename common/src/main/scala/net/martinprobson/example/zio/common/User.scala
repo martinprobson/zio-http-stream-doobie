@@ -2,7 +2,7 @@ package net.martinprobson.example.zio.common
 
 import zio.json.*
 import User.*
-import io.getquill.MappedEncoding
+//import io.getquill.MappedEncoding
 
 type USER_ID = Long
 type UserName = String
