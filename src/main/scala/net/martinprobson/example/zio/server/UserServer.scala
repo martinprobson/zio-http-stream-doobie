@@ -4,16 +4,22 @@ import zio.*
 import zio.http.*
 import net.martinprobson.example.zio.common.ZIOApplication
 import net.martinprobson.example.zio.common.config.AppConfig
-import net.martinprobson.example.zio.repository.{InMemoryUserRepository, UserRepository}
+import net.martinprobson.example.zio.repository.{
+  InMemoryUserRepository,
+  QuillUserRepository,
+  DataService,
+  UserRepository
+}
+import io.getquill.jdbczio.Quill
+import io.getquill.SnakeCase
 
 object UserServer extends ZIOApplication:
 
   private def program: RIO[UserRepository, Unit] = for
-    _ <- ZIO.logInfo(s"Starting server ")
     config <- ZIO.config(AppConfig.config)
+    _ <- ZIO.logInfo(s"Starting server on port ${config.port} ")
     server <- Server
       .serve(UserApp().withDefaultErrorResponse)
-      .flatMap(port => ZIO.logInfo(s"Server start on port: $port"))
       .provideSome[UserRepository](
         Server.live,
         ZLayer.succeed(Server.Config.default.port(config.port))
@@ -24,6 +30,12 @@ object UserServer extends ZIOApplication:
     _ <- server.interrupt
   yield ()
 
-  def run: Task[Unit] = program.provide(InMemoryUserRepository.layer)
+//  def run: Task[Unit] = program.provide(InMemoryUserRepository.layer)
+  def run: Task[Unit] = program.provide(
+    QuillUserRepository.layer,
+    DataService.layer,
+    Quill.Mysql.fromNamingStrategy(SnakeCase),
+    Quill.DataSource.fromPrefix("testMysqlDB")
+  )
 
 end UserServer

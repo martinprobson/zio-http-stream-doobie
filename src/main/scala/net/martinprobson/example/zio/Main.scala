@@ -3,10 +3,9 @@ package net.martinprobson.example.zio
 import zio.{Chunk, Task, UIO, ZIO, ZLayer}
 import zio.stream.*
 
+import net.martinprobson.example.zio.common.User
 import net.martinprobson.example.zio.common.{
   User,
-  UserName,
-  Email,
   ZIOApplication
 }
 
@@ -14,7 +13,7 @@ object Main extends ZIOApplication:
 
   val numbers = 1 to 1000
   val users: ZPipeline[Any, Nothing, Int, User] =
-    ZPipeline.map(i => User(UserName(s"name-$i"), Email(s"email-$i")))
+    ZPipeline.map(i => User(s"name-$i", s"email-$i"))
   val take5 = ZSink.take(5)
 
   val userStream: UIO[Chunk[User]] =

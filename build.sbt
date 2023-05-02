@@ -15,11 +15,13 @@ lazy val root = (project in file("."))
     // zio http
     "dev.zio" %% "zio-http" % "3.0.0-RC1",
     "dev.zio" %% "zio-json" % "0.4.2",
+    // quill
+    "io.getquill" %% "quill-jdbc-zio" % "4.6.0.1",
     // zio Config
     "dev.zio" %% "zio-config" % "4.0.0-RC12",
     "dev.zio" %% "zio-config-magnolia" % "4.0.0-RC12",
     "dev.zio" %% "zio-config-typesafe" % "4.0.0-RC12",
-    // Logging 
+    // Logging
     "ch.qos.logback" % "logback-classic" % "1.2.11",
     "ch.qos.logback" % "logback-core" % "1.2.11",
     // Db Drivers

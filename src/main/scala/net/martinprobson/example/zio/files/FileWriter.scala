@@ -8,12 +8,7 @@ import zio.json.*
 import java.io.{File, IOException}
 import java.nio.file.Path
 
-import net.martinprobson.example.zio.common.{
-  ZIOApplication,
-  User,
-  UserName,
-  Email
-}
+import net.martinprobson.example.zio.common.{ZIOApplication, User}
 
 object FileWriter extends ZIOApplication:
 
@@ -29,7 +24,7 @@ object FileWriter extends ZIOApplication:
   ): ZIO[FileConnector, IOException, Unit] =
     ZStream
       .iterate(((fileIndex - 1) * numOfLines) + 1)(_ + 1)
-      .map(n => User(UserName(s"Username-$n"), Email(s"email-$n")))
+      .map(n => User(s"Username-$n", s"email-$n"))
       .map(u => u.toJson)
       .take(numOfLines)
       .tap(res => ZIO.logInfo(res.toString))

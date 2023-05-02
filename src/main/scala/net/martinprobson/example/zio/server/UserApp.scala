@@ -5,7 +5,7 @@ import zio.http.*
 //import zio.http.model.*
 import zio.json.*
 
-import net.martinprobson.example.zio.common.{User, USER_ID, UserName}
+import net.martinprobson.example.zio.common.{User, USER_ID}
 import net.martinprobson.example.zio.repository.UserRepository
 
 object UserApp:
@@ -66,7 +66,7 @@ object UserApp:
 
       case req @ Method.GET -> !! / "user" / "name" / name =>
         UserRepository
-          .getUserByName(UserName(name))
+          .getUserByName(name)
           .map(users => Response.text(users.toJsonPretty))
 
       case req @ Method.GET -> !! / "users" / "count" =>
