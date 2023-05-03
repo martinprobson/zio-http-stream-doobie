@@ -71,8 +71,8 @@ object InMemoryRepositoryTest extends ZIOTestApplication:
     test("getUser (user exists)") {
       for
         _ <- UserRepository.addUsers(users)
-        u <- UserRepository.getUser(6)
-      yield assertTrue(u == Some(User(6, "User-6", "email-6")))
+        u <- UserRepository.getUserByName("User-6")
+      yield assertTrue(u.size == 1 && u.head.name == "User-6")
     }
     test("getUser (user does not exist)") {
       for

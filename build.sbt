@@ -5,12 +5,12 @@ ThisBuild / organization := "net.martinprobson.example"
 
 val zioVersion            = "2.0.10"
 val zioConnectFileVersion = "0.4.4"
-val zioLoggingVersion     = "2.1.10"
+val zioLoggingVersion     = "2.1.11"
 val zioHttpVersion        = "3.0.0-RC1"
 val zioJsonVersion        = "0.4.2"
 val quillVersion          = "4.6.0.1"
 val zioConfigVersion      = "4.0.0-RC12"
-val logbackVersion        = "1.2.11"
+val logbackVersion        = "1.4.6"
 
 val commonDependencies = Seq(
   "dev.zio" %% "zio" % zioVersion,
@@ -19,8 +19,6 @@ val commonDependencies = Seq(
   // zio logging
   "dev.zio" %% "zio-logging" % zioLoggingVersion,
   "dev.zio" %% "zio-logging-slf4j" % zioLoggingVersion,
-  "ch.qos.logback" % "logback-classic" % logbackVersion,
-  "ch.qos.logback" % "logback-core" % logbackVersion,
   // zio Config
   "dev.zio" %% "zio-config" % zioConfigVersion,
   "dev.zio" %% "zio-config-magnolia" % zioConfigVersion,
@@ -85,6 +83,13 @@ lazy val server = project
     Seq("dev.zio" %% "zio-http" % zioHttpVersion,
         // quill
         "io.getquill" %% "quill-jdbc-zio" % quillVersion,
+        // Doobie
+        "org.tpolecat" %% "doobie-core" % "1.0.0-RC1",
+        "org.tpolecat" %% "doobie-hikari" %  "1.0.0-RC1",
+        // CATS / Zio interop
+        "dev.zio" %% "zio-interop-cats" % "3.3.0",
+        // Logging (Cats)
+        "org.typelevel" %% "log4cats-slf4j" % "2.5.0",
         // Db Drivers
         "mysql" % "mysql-connector-java" % "8.0.30",
         "com.h2database" % "h2" % "1.4.200")
@@ -100,6 +105,8 @@ lazy val compilerOptions = Seq(
   "-deprecation",         // Emit warning and location for usages of deprecated APIs.
   "-explaintypes",        // Explain type errors in more detail.
   "-Xfatal-warnings",     // Fail the compilation if there are any warnings.
+  "-encoding",
+  "utf8",
   "-Yretain-trees"        // This is needed for zio-json (see https://github.com/zio/zio-json/issues/779)
 )
 

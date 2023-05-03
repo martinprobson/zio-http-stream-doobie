@@ -4,18 +4,13 @@ import zio.*
 import zio.http.*
 import net.martinprobson.example.zio.common.ZIOApplication
 import net.martinprobson.example.zio.common.config.AppConfig
-import net.martinprobson.example.zio.repository.{
-  InMemoryUserRepository,
-  QuillUserRepository,
-  DataService,
-  UserRepository
-}
+import net.martinprobson.example.zio.repository.{DataService, DoobieUserRepository, InMemoryUserRepository, QuillUserRepository, TransactorLive, UserRepository}
 import io.getquill.jdbczio.Quill
 import io.getquill.SnakeCase
 
-object UserServer extends ZIOApplication:
+object UserServer extends ZIOApplication {
 
-  private def program: RIO[UserRepository, Unit] = for
+  private def program: RIO[UserRepository, Unit] = for {
     config <- ZIO.config(AppConfig.config)
     _ <- ZIO.logInfo(s"Starting server on port ${config.port} ")
     server <- Server
@@ -23,19 +18,27 @@ object UserServer extends ZIOApplication:
       .provideSome[UserRepository](
         Server.live,
         ZLayer.succeed(Server.Config.default.port(config.port))
-      )
-      .fork
+      ).fork
     _ <- Console.readLine("Press enter to stop the server\n")
     _ <- Console.printLine("Interrupting server")
     _ <- server.interrupt
-  yield ()
+  } yield ()
 
-//  def run: Task[Unit] = program.provide(InMemoryUserRepository.layer)
+  //TODO InMemory
+  //  def run: Task[Unit] = program.provide(InMemoryUserRepository.layer)
+
+  //TODO Quill
+  //def run: Task[Unit] = program.provide(
+  //  QuillUserRepository.layer,
+  //  DataService.layer,
+  //  Quill.Mysql.fromNamingStrategy(SnakeCase),
+  //  Quill.DataSource.fromPrefix("testMysqlDB")
+  //)
+
+  //TODO Doobie
   def run: Task[Unit] = program.provide(
-    QuillUserRepository.layer,
-    DataService.layer,
-    Quill.Mysql.fromNamingStrategy(SnakeCase),
-    Quill.DataSource.fromPrefix("testMysqlDB")
+    DoobieUserRepository.layer,
+    TransactorLive.layer
   )
 
-end UserServer
+}

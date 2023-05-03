@@ -27,7 +27,7 @@ object Main extends ZIOApplication:
   override def run: Task[Unit] = program.provide(
     UserClientLive.layer,
     Client.default,
-    MemorySource(100000).layer
+    MemorySource(5000).layer
   )
 //    fileConnectorLiveLayer,
 //    Scope.default)
