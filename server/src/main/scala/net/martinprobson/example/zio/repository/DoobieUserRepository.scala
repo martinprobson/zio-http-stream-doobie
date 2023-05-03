@@ -92,7 +92,7 @@ object DoobieUserRepository {
       for {
         xa <- ZIO.service[Transactor[Task]]
         u  <- ZIO.attempt(DoobieUserRepository(xa))
-        - <- u.createTable
+        _ <- u.createTable
       } yield u
     }
 }
