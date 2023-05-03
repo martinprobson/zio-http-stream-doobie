@@ -8,7 +8,6 @@ val zioConnectFileVersion = "0.4.4"
 val zioLoggingVersion     = "2.1.11"
 val zioHttpVersion        = "3.0.0-RC1"
 val zioJsonVersion        = "0.4.2"
-val quillVersion          = "4.6.0.1"
 val zioConfigVersion      = "4.0.0-RC12"
 val logbackVersion        = "1.4.6"
 
@@ -24,8 +23,8 @@ val commonDependencies = Seq(
   "dev.zio" %% "zio-config-magnolia" % zioConfigVersion,
   "dev.zio" %% "zio-config-typesafe" % zioConfigVersion,
   // Logging
-  "ch.qos.logback" % "logback-classic" % logbackVersion,
-  "ch.qos.logback" % "logback-core" % logbackVersion,
+  "ch.qos.logback" % "logback-classic" % "1.2.11",
+  "ch.qos.logback" % "logback-core" % "1.2.11",
   // Testing
   "dev.zio" %% "zio-test" % zioVersion % Test,
   "dev.zio" %% "zio-test-sbt" % zioVersion  % Test
@@ -81,8 +80,6 @@ lazy val server = project
   .settings(libraryDependencies ++=
     commonDependencies ++
     Seq("dev.zio" %% "zio-http" % zioHttpVersion,
-        // quill
-        "io.getquill" %% "quill-jdbc-zio" % quillVersion,
         // Doobie
         "org.tpolecat" %% "doobie-core" % "1.0.0-RC1",
         "org.tpolecat" %% "doobie-hikari" %  "1.0.0-RC1",
@@ -90,6 +87,9 @@ lazy val server = project
         "dev.zio" %% "zio-interop-cats" % "3.3.0",
         // Logging (Cats)
         "org.typelevel" %% "log4cats-slf4j" % "2.5.0",
+        // Logging
+        "ch.qos.logback" % "logback-classic" % "1.2.11",
+        "ch.qos.logback" % "logback-core" % "1.2.11",
         // Db Drivers
         "mysql" % "mysql-connector-java" % "8.0.30",
         "com.h2database" % "h2" % "1.4.200")

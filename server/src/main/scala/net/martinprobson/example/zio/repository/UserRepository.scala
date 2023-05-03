@@ -15,18 +15,17 @@ trait UserRepository:
   //  TODO Add
   //  def getUsersStream: Stream[IO, User]
 
-  //  TODO Add
-  //  def getUserPaged(pageNo: Int, pageSize: Int): Task[List[User]]
-  def getOrAdd(user: User): Task[User] = for
+  def getUsersPaged(pageNo: Int, pageSize: Int): Task[List[User]]
+  def getOrAdd(user: User): Task[User] = for {
     userList <- getUserByName(user.name)
     newUser <-
       userList.headOption match {
         case Some(o) => ZIO.succeed(o)
-        case None    => addUser(user)
+        case None => addUser(user)
       }
-  yield newUser
+  } yield newUser
 
-object UserRepository:
+object UserRepository {
   def addUser(user: User): ZIO[UserRepository, Throwable, User] =
     ZIO.serviceWithZIO[UserRepository](_.addUser(user))
 
@@ -40,8 +39,8 @@ object UserRepository:
     ZIO.serviceWithZIO[UserRepository](_.countUsers)
 
   def getUserByName(
-      name: UserName
-  ): ZIO[UserRepository, Throwable, List[User]] =
+                     name: UserName
+                   ): ZIO[UserRepository, Throwable, List[User]] =
     ZIO.serviceWithZIO[UserRepository](_.getUserByName(name))
 
   def getUsers: ZIO[UserRepository, Throwable, List[User]] =
@@ -49,3 +48,7 @@ object UserRepository:
 
   def getOrAdd(user: User): ZIO[UserRepository, Throwable, User] =
     ZIO.serviceWithZIO[UserRepository](_.getOrAdd(user))
+
+  def getUsersPaged(pageNo: Int, pageSize: Int): ZIO[UserRepository, Throwable, List[User]] =
+    ZIO.serviceWithZIO[UserRepository](_.getUsersPaged(pageNo, pageSize))
+}

@@ -64,6 +64,11 @@ object UserApp:
                 )
         yield r
 
+      case req@Method.GET -> !! / "users" / "paged" / pageNo / pageSize =>
+        UserRepository
+          .getUsersPaged(pageNo.toInt,pageSize.toInt)
+          .map(users => Response.text(users.toJsonPretty))
+
       case req @ Method.GET -> !! / "user" / "name" / name =>
         UserRepository
           .getUserByName(name)

@@ -1,5 +1,6 @@
 package net.martinprobson.example.zio
 
+import zio.config.typesafe.TypesafeConfigProvider
 import zio.logging.*
 import zio.logging.LogFormat.*
 import zio.logging.backend.SLF4J
@@ -21,8 +22,7 @@ trait ZIOTestApplication extends ZIOSpecDefault {
   /** Remove the default logger and replace with our slf4j custom log format.
     */
   override val bootstrap: ZLayer[Any, Any, TestEnvironment] =
-    // Runtime.removeDefaultLoggers >>> SLF4J.slf4j(LogFormat.colored)
-    // SLF4J.slf4j(logFormat) >>> testEnvironment
-    Runtime.removeDefaultLoggers >>> SLF4J.slf4j(logFormat) >>> testEnvironment
-    // Runtime.removeDefaultLoggers >>> SLF4J.slf4j(logFormat)
+    Runtime.removeDefaultLoggers >>> SLF4J.slf4j(logFormat) >>>
+      Runtime.setConfigProvider(TypesafeConfigProvider.fromResourcePath) >>>
+      testEnvironment
 }

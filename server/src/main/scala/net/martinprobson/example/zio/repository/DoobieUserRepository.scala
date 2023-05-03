@@ -62,8 +62,11 @@ class DoobieUserRepository(xa: Transactor[Task]) extends UserRepository {
     _ <- log.info(s"getUser: result is $o")
   } yield o
 
-  //TODO Add
-  //override def getUserPaged(pageNo: Int, pageSize: Int): Task[List[User]] = selectPaged(pageNo, pageSize).transact(xa)
+  override def getUsersPaged(pageNo: Int, pageSize: Int): Task[List[User]] = for {
+    _ <- log.info(s"getUsersPaged: pageNo: $pageNo pageSize: $pageSize")
+    users <- selectPaged(pageNo, pageSize).transact(xa)
+    _ <- log.info(s"getUsersPaged: return $users")
+  } yield users
 
   override def getUserByName(name: String): Task[List[User]] = selectByName(name).transact(xa)
 
@@ -83,17 +86,13 @@ class DoobieUserRepository(xa: Transactor[Task]) extends UserRepository {
          |""".stripMargin.update.run.transact(xa)
 }
 
-//TODO Remove?
-//object DoobieUserRepository {
-//  def apply(xa: Transactor[Task]): Task[DoobieUserRepository] = for {
-//    userRepository <- ZIO.attempt(new DoobieUserRepository(xa))
-//    _ <- userRepository.createTable
-//  } yield userRepository
-//}
 object DoobieUserRepository {
   val layer: ZLayer[Transactor[Task], Throwable, UserRepository] =
     ZLayer {
-      for xa <- ZIO.service[Transactor[Task]]
-        yield DoobieUserRepository(xa)
+      for {
+        xa <- ZIO.service[Transactor[Task]]
+        u  <- ZIO.attempt(DoobieUserRepository(xa))
+        - <- u.createTable
+      } yield u
     }
 }

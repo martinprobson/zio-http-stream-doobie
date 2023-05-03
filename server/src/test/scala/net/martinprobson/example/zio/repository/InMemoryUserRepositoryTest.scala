@@ -1,17 +1,14 @@
 package net.martinprobson.example.zio.repository
 
-import zio.ZIO
+import zio.{Scope, ZIO}
 import zio.test.*
 import net.martinprobson.example.zio.ZIOTestApplication
 import net.martinprobson.example.zio.common.User
-import net.martinprobson.example.zio.repository.{
-  InMemoryUserRepository,
-  UserRepository
-}
+import net.martinprobson.example.zio.repository.{InMemoryUserRepository, UserRepository}
 
-object InMemoryRepositoryTest extends ZIOTestApplication:
+object InMemoryUserRepositoryTest extends ZIOTestApplication:
 
-  def spec = suiteAll("InMemoryRepositoryTest") {
+  def spec: Spec[TestEnvironment with Scope, Any] = suiteAll("InMemoryRepositoryTest") {
     val users = Range(1, 20).inclusive.toList
       .map { i => User(s"User-$i", s"email-$i") }
 
@@ -22,7 +19,7 @@ object InMemoryRepositoryTest extends ZIOTestApplication:
     }
     test("countUsers (non-empty database)") {
       for
-        _ <- ZIO.foreachPar(users)(user => UserRepository.addUser(user))
+        _ <- ZIO.foreachParDiscard(users)(user => UserRepository.addUser(user))
         c <- UserRepository.countUsers
       yield assertTrue(c == users.size)
     }
@@ -51,7 +48,7 @@ object InMemoryRepositoryTest extends ZIOTestApplication:
         _ <- UserRepository.addUsers(users)
         _ <- UserRepository.addUsers(users)
         u <- UserRepository.getUserByName("User-5")
-      yield assertTrue(u.filter(u => u.name == "User-5").size == 2)
+      yield assertTrue(u.count(u => u.name == "User-5") == 2)
     }
     test("getUserByName (no match)") {
       for
@@ -78,6 +75,27 @@ object InMemoryRepositoryTest extends ZIOTestApplication:
       for
         _ <- UserRepository.addUsers(users)
         u <- UserRepository.getUser(9999)
-      yield assertTrue(u == None)
+      yield assertTrue(u.isEmpty)
+    }
+    test("getUsersPaged (non empty database)") {
+      for
+        _ <- UserRepository.addUsers(users)
+        u <- UserRepository.getUsersPaged(0,2)
+      yield assertTrue(u.size == 2 && u.head.id == 1 && u.tail.head.id == 2)
+    }
+    test("getUsersPaged (empty database)") {
+      UserRepository.getUsersPaged(0,2).flatMap(u => assertTrue(u.isEmpty))
+    }
+    test("getUsersPaged (page size bigger than users in db)") {
+      for
+        _ <- UserRepository.addUsers(users)
+        u <- UserRepository.getUsersPaged(0, 2000)
+      yield assertTrue(u.size == 20)
+    }
+    test("getUsersPaged (page number bigger than users in db)") {
+      for
+        _ <- UserRepository.addUsers(users)
+        u <- UserRepository.getUsersPaged(20000, 1)
+      yield assertTrue(u.size == 0)
     }
   }.provide(InMemoryUserRepository.layer)

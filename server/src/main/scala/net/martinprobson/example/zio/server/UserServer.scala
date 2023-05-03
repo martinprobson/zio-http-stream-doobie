@@ -4,9 +4,7 @@ import zio.*
 import zio.http.*
 import net.martinprobson.example.zio.common.ZIOApplication
 import net.martinprobson.example.zio.common.config.AppConfig
-import net.martinprobson.example.zio.repository.{DataService, DoobieUserRepository, InMemoryUserRepository, QuillUserRepository, TransactorLive, UserRepository}
-import io.getquill.jdbczio.Quill
-import io.getquill.SnakeCase
+import net.martinprobson.example.zio.repository.{DoobieUserRepository, InMemoryUserRepository, TransactorLive, UserRepository}
 
 object UserServer extends ZIOApplication {
 
@@ -24,18 +22,10 @@ object UserServer extends ZIOApplication {
     _ <- server.interrupt
   } yield ()
 
-  //TODO InMemory
+  // Run with an InMemory user repository.
   //  def run: Task[Unit] = program.provide(InMemoryUserRepository.layer)
 
-  //TODO Quill
-  //def run: Task[Unit] = program.provide(
-  //  QuillUserRepository.layer,
-  //  DataService.layer,
-  //  Quill.Mysql.fromNamingStrategy(SnakeCase),
-  //  Quill.DataSource.fromPrefix("testMysqlDB")
-  //)
-
-  //TODO Doobie
+  // Run with a database backed UserRepository vai Doobie.
   def run: Task[Unit] = program.provide(
     DoobieUserRepository.layer,
     TransactorLive.layer

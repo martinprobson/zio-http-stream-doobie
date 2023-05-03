@@ -10,12 +10,12 @@ import scala.collection.immutable.SortedMap
 case class InMemoryUserRepository(
     db: Ref[SortedMap[USER_ID, User]],
     counter: Ref[USER_ID]
-) extends UserRepository:
+) extends UserRepository {
 
   def addUser(user: User): Task[User] = for
     id <- counter.modify(x => (x + 1, x + 1))
     _ <- ZIO.logInfo(s"About to create User: $user")
-    _ <- db.update(users => users.updated(key = id, value = user))
+    _ <- db.update(users => users.updated(key = id, value = user.copy(id = id)))
     u <- ZIO.succeed(User(id, user.name, user.email))
     _ <- ZIO.logInfo(s"Created User: $u")
   yield u
@@ -43,7 +43,12 @@ case class InMemoryUserRepository(
       .toList
   }
 
-object InMemoryUserRepository:
+  override def getUsersPaged(pageNo: Int, pageSize: Int): Task[List[User]] = db.get.flatMap { users =>
+    ZIO.attempt(users.slice(pageNo * pageSize, pageNo * pageSize + pageSize).toList.map { case (_, user) => user })
+  }
+}
+
+object InMemoryUserRepository {
   val layer: ULayer[UserRepository] =
     ZLayer {
       for
@@ -51,3 +56,4 @@ object InMemoryUserRepository:
         db <- Ref.make(SortedMap.empty[USER_ID, User])
       yield InMemoryUserRepository(db, counter)
     }
+}
