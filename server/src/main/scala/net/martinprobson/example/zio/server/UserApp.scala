@@ -57,11 +57,10 @@ object UserApp:
             case Right(u) =>
               UserRepository
                 .getUser(u)
-                .map(user =>
-                  user match
-                    case Some(u) => Response.text(u.toJsonPretty)
-                    case None    => Response(status = Status.NotFound)
-                )
+                .map {
+                  case Some(u) => Response.text(u.toJsonPretty)
+                  case None => Response(status = Status.NotFound)
+                }
         yield r
 
       case req@Method.GET -> !! / "users" / "paged" / pageNo / pageSize =>

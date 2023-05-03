@@ -96,6 +96,6 @@ object InMemoryUserRepositoryTest extends ZIOTestApplication:
       for
         _ <- UserRepository.addUsers(users)
         u <- UserRepository.getUsersPaged(20000, 1)
-      yield assertTrue(u.size == 0)
+      yield assertTrue(u.isEmpty)
     }
   }.provide(InMemoryUserRepository.layer)
