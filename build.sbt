@@ -1,4 +1,4 @@
-name := "zio with zio-http, zio-streams and quill example"
+name := "zio with zio-http, zio-streams and doobie example"
 ThisBuild / scalaVersion := "3.2.2"
 ThisBuild / version := "0.0.1-SNAPSHOT"
 ThisBuild / organization := "net.martinprobson.example"
