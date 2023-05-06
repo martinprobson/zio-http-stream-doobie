@@ -18,7 +18,7 @@ object FileWriter extends ZIOApplication:
     * @param numOfLines
     *   The number of Users per file
     */
-  def generateUserFile(
+  private def generateUserFile(
       fileIndex: Int,
       numOfLines: Long
   ): ZIO[FileConnector, IOException, Unit] =
@@ -27,7 +27,7 @@ object FileWriter extends ZIOApplication:
       .map(n => User(s"Username-$n", s"email-$n"))
       .map(u => u.toJson)
       .take(numOfLines)
-      .tap(res => ZIO.logInfo(res.toString))
+      .tap(res => ZIO.logInfo(res))
       .via(ZPipeline.intersperse("\n"))
       .via(ZPipeline.utf8Encode)
       .run(
@@ -43,7 +43,7 @@ object FileWriter extends ZIOApplication:
     * @param numOfLines
     *   The number of Users per file
     */
-  def generateUserFiles(
+  private def generateUserFiles(
       numFiles: Int,
       numOfLines: Long
   ): ZIO[FileConnector, IOException, Unit] =

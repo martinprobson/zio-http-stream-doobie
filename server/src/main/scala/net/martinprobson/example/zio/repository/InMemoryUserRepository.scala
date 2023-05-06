@@ -2,9 +2,10 @@ package net.martinprobson.example.zio.repository
 
 import zio.{Ref, Task, ULayer, ZIO, ZLayer}
 import zio.ZIOAspect.*
-
-import net.martinprobson.example.zio.common.{User, USER_ID, UserName}
+import net.martinprobson.example.zio.common.{USER_ID, User, UserName}
 import net.martinprobson.example.zio.repository.UserRepository
+import zio.stream.ZStream
+
 import scala.collection.immutable.SortedMap
 
 case class InMemoryUserRepository(

@@ -4,7 +4,12 @@ import zio.*
 import zio.http.*
 import net.martinprobson.example.zio.common.ZIOApplication
 import net.martinprobson.example.zio.common.config.AppConfig
-import net.martinprobson.example.zio.repository.{DoobieUserRepository, InMemoryUserRepository, TransactorLive, UserRepository}
+import net.martinprobson.example.zio.repository.{
+  DoobieUserRepository,
+  InMemoryUserRepository,
+  TransactorLive,
+  UserRepository
+}
 
 object UserServer extends ZIOApplication {
 
@@ -23,12 +28,12 @@ object UserServer extends ZIOApplication {
   } yield ()
 
   // Run with an InMemory user repository.
-  //  def run: Task[Unit] = program.provide(InMemoryUserRepository.layer)
+  def run: Task[Unit] = program.provide(InMemoryUserRepository.layer)
 
-  // Run with a database backed UserRepository vai Doobie.
-  def run: Task[Unit] = program.provide(
-    DoobieUserRepository.layer,
-    TransactorLive.layer
-  )
+  // Run with a database backed UserRepository via Doobie.
+  //def run: Task[Unit] = program.provide(
+  //  DoobieUserRepository.layer,
+  //  TransactorLive.layer
+  //)
 
 }

@@ -11,7 +11,7 @@ import net.martinprobson.example.zio.common.{Email, Source, User, UserName, ZIOA
 
 object FileSource extends ZIOApplication with Source:
 
-  val userStream: ZStream[FileConnector, IOException, User] =
+  private val userStream: ZStream[FileConnector, IOException, User] =
     listPath(Path.of("/tmp/"))
       .filter(p => p.getFileName.toString.startsWith("test_file_"))
       .map { path =>

@@ -74,7 +74,7 @@ class DoobieUserRepository(xa: Transactor[Task]) extends UserRepository {
 
   override def countUsers: Task[Long] = selectCount.transact(xa)
 
-  def createTable: Task[Int] =
+  private def createTable: Task[Int] =
     sql"""
          |create table if not exists user
          |(

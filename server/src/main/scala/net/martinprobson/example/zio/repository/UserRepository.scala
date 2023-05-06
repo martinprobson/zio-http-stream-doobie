@@ -2,6 +2,7 @@ package net.martinprobson.example.zio.repository
 
 import net.martinprobson.example.zio.common.{User, USER_ID, UserName}
 import zio.{Task, ZIO}
+import zio.stream.*
 import User.*
 
 trait UserRepository:
@@ -12,8 +13,6 @@ trait UserRepository:
   def countUsers: Task[Long]
   def getUserByName(name: UserName): Task[List[User]]
   def getUsers: Task[List[User]]
-  //  TODO Add
-  //  def getUsersStream: Stream[IO, User]
 
   def getUsersPaged(pageNo: Int, pageSize: Int): Task[List[User]]
   def getOrAdd(user: User): Task[User] = for {

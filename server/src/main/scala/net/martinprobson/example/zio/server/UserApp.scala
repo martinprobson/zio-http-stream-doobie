@@ -2,11 +2,10 @@ package net.martinprobson.example.zio.server
 
 import zio.*
 import zio.http.*
-//import zio.http.model.*
 import zio.json.*
-
-import net.martinprobson.example.zio.common.{User, USER_ID}
+import net.martinprobson.example.zio.common.{USER_ID, User}
 import net.martinprobson.example.zio.repository.UserRepository
+import zio.stream.ZStream
 
 object UserApp:
 
@@ -59,13 +58,13 @@ object UserApp:
                 .getUser(u)
                 .map {
                   case Some(u) => Response.text(u.toJsonPretty)
-                  case None => Response(status = Status.NotFound)
+                  case None    => Response(status = Status.NotFound)
                 }
         yield r
 
-      case req@Method.GET -> !! / "users" / "paged" / pageNo / pageSize =>
+      case req @ Method.GET -> !! / "users" / "paged" / pageNo / pageSize =>
         UserRepository
-          .getUsersPaged(pageNo.toInt,pageSize.toInt)
+          .getUsersPaged(pageNo.toInt, pageSize.toInt)
           .map(users => Response.text(users.toJsonPretty))
 
       case req @ Method.GET -> !! / "user" / "name" / name =>
@@ -76,6 +75,15 @@ object UserApp:
       case req @ Method.GET -> !! / "users" / "count" =>
         UserRepository.countUsers
           .map(count => Response.text(count.toString))
+
+      case req @ Method.GET -> !! / "hello" =>
+        ZIO.logInfo("In hello") *> ZIO.succeed(Response.text("Hello world"))
+
+      case req @ Method.GET -> !! / "seconds" =>
+        ZIO.logInfo("seconds") *> ZIO.succeed(
+          Response(body = Body.fromStream(InfiniteStream.stream.take(10)))
+        )
+
     }
 
 end UserApp

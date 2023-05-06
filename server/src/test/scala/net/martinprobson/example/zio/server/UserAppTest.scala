@@ -4,7 +4,7 @@ import net.martinprobson.example.zio.ZIOTestApplication
 import net.martinprobson.example.zio.common.User
 import net.martinprobson.example.zio.repository.InMemoryUserRepository
 import net.martinprobson.example.zio.server.UserAppTest.{suiteAll, test}
-import zio.ZIO
+import zio.{Scope, ZIO}
 import zio.http.*
 import zio.json.*
 import zio.test.*
@@ -14,7 +14,7 @@ object UserAppTest extends ZIOTestApplication:
 
   private val app = UserApp()
 
-  def spec = suiteAll("UserAppTest") {
+  def spec: Spec[TestEnvironment with Scope, Any] = suiteAll("UserAppTest") {
     val users = Range(1, 20).inclusive.toList
       .map { i => User(s"User-$i", s"email-$i") }
 
@@ -88,7 +88,7 @@ object UserAppTest extends ZIOTestApplication:
       val path = !! / "users" / "count"
       val req = Request.get(url = URL(path))
       for actualBody <- app.runZIO(req).flatMap(_.body.asString)
-      yield assert(actualBody)(equalTo("0"))
+      yield assertTrue(actualBody == "0")
     }
 
     test("count users - (non-empty database)") {
@@ -102,7 +102,7 @@ object UserAppTest extends ZIOTestApplication:
       for
         _ <- app.runZIO(addUsersReq)
         actualBody <- app.runZIO(req).flatMap(_.body.asString)
-      yield assert(actualBody)(equalTo(users.size.toString))
+      yield assertTrue(actualBody == users.size.toString)
     }
 //TODO test for count
   }.provide(InMemoryUserRepository.layer)
