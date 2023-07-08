@@ -21,7 +21,7 @@ object UserAppTest extends ZIOTestApplication:
     val user = users.head
 
     test("addUser") {
-      val path = !! / "user"
+      val path = Root / "user"
       val req =
         Request.post(body = Body.fromString(user.toJson), url = URL(path))
       for actualBody <- app.runZIO(req).flatMap(_.body.asString)
@@ -29,7 +29,7 @@ object UserAppTest extends ZIOTestApplication:
     }
 
     test("addUsers") {
-      val path = !! / "users"
+      val path = Root / "users"
       val req =
         Request.post(body = Body.fromString(users.toJson), url = URL(path))
       for actualBody <- app.runZIO(req).flatMap(_.body.asString)
@@ -39,7 +39,7 @@ object UserAppTest extends ZIOTestApplication:
     }
 
     test("getUsers - empty") {
-      val path = !! / "users"
+      val path = Root / "users"
       app
         .runZIO(Request.get(url = URL(path)))
         .flatMap(_.body.asString)
@@ -49,7 +49,7 @@ object UserAppTest extends ZIOTestApplication:
     }
 
     test("getUsers - not empty") {
-      val path = !! / "users"
+      val path = Root / "users"
       val req = Request.get(url = URL(path))
       val addUsersReq =
         Request.post(body = Body.fromString(users.toJson), url = URL(path))
@@ -62,12 +62,12 @@ object UserAppTest extends ZIOTestApplication:
     }
 
     test("getUser - (user exists)") {
-      val path = !! / "user" / "4"
+      val path = Root / "user" / "4"
       val req = Request.get(url = URL(path))
       val addUsersReq =
         Request.post(
           body = Body.fromString(users.toJson),
-          url = URL(!! / "users")
+          url = URL(Root / "users")
         )
       for
         _ <- app.runZIO(addUsersReq)
@@ -78,26 +78,26 @@ object UserAppTest extends ZIOTestApplication:
     }
 
     test("getUser - (user does not exist)") {
-      val path = !! / "user" / "4"
+      val path = Root / "user" / "4"
       val req = Request.get(url = URL(path))
       for resp <- app.runZIO(req)
       yield assertTrue(resp.status == Status.NotFound)
     }
 
     test("count users - (empty database)") {
-      val path = !! / "users" / "count"
+      val path = Root / "users" / "count"
       val req = Request.get(url = URL(path))
       for actualBody <- app.runZIO(req).flatMap(_.body.asString)
       yield assertTrue(actualBody == "0")
     }
 
     test("count users - (non-empty database)") {
-      val path = !! / "users" / "count"
+      val path = Root / "users" / "count"
       val req = Request.get(url = URL(path))
       val addUsersReq =
         Request.post(
           body = Body.fromString(users.toJson),
-          url = URL(!! / "users")
+          url = URL(Root / "users")
         )
       for
         _ <- app.runZIO(addUsersReq)

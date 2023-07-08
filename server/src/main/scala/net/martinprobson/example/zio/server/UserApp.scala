@@ -11,7 +11,7 @@ object UserApp:
 
   def apply(): HttpApp[UserRepository, Throwable] =
     Http.collectZIO[Request] {
-      case req @ Method.POST -> !! / "users" =>
+      case req @ Method.POST -> Root / "users" =>
         for
           users <- req.body.asString.map(_.fromJson[List[User]])
           response <- users match
@@ -24,7 +24,7 @@ object UserApp:
                 .addUsers(users)
                 .map(users => Response.text(users.toJson))
         yield response
-      case req @ Method.POST -> !! / "user" =>
+      case req @ Method.POST -> Root / "user" =>
         for
           u <- req.body.asString.map(_.fromJson[User])
           r <- u match
@@ -40,10 +40,10 @@ object UserApp:
                 .map(user => Response.text(user.toJson))
         yield r
 
-      case req @ Method.GET -> !! / "users" =>
+      case req @ Method.GET -> Root / "users" =>
         UserRepository.getUsers.map(users => Response.text(users.toJsonPretty))
 
-      case req @ Method.GET -> !! / "user" / id =>
+      case req @ Method.GET -> Root / "user" / id =>
         for
           i <- ZIO.attempt(id.toLong).either
           r <- i match
@@ -62,24 +62,24 @@ object UserApp:
                 }
         yield r
 
-      case req @ Method.GET -> !! / "users" / "paged" / pageNo / pageSize =>
+      case req @ Method.GET -> Root / "users" / "paged" / pageNo / pageSize =>
         UserRepository
           .getUsersPaged(pageNo.toInt, pageSize.toInt)
           .map(users => Response.text(users.toJsonPretty))
 
-      case req @ Method.GET -> !! / "user" / "name" / name =>
+      case req @ Method.GET -> Root / "user" / "name" / name =>
         UserRepository
           .getUserByName(name)
           .map(users => Response.text(users.toJsonPretty))
 
-      case req @ Method.GET -> !! / "users" / "count" =>
+      case req @ Method.GET -> Root / "users" / "count" =>
         UserRepository.countUsers
           .map(count => Response.text(count.toString))
 
-      case req @ Method.GET -> !! / "hello" =>
+      case req @ Method.GET -> Root / "hello" =>
         ZIO.logInfo("In hello") *> ZIO.succeed(Response.text("Hello world"))
 
-      case req @ Method.GET -> !! / "seconds" =>
+      case req @ Method.GET -> Root / "seconds" =>
         ZIO.logInfo("seconds") *> ZIO.succeed(
           Response(body = Body.fromStream(InfiniteStream.stream.take(10)))
         )
