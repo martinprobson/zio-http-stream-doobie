@@ -20,7 +20,7 @@ case class UserClientLive(client: Client) extends UserClient:
   yield resp
 
 object UserClientLive:
-  val layer: ZLayer[Client, Throwable, UserClientLive] = ZLayer {
+  val layer: ZLayer[Client, Throwable, UserClient] = ZLayer {
     for client <- ZIO.service[Client]
     yield UserClientLive(client)
   }
