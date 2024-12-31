@@ -11,10 +11,12 @@ case class UserClientLive(client: Client) extends UserClient:
     _ <- ZIO.logInfo(s"In addUser - user = $user")
     config <- ZIO.config(AppConfig.config)
     resp <- client
-      .request(
+      .batched(
         Request.post(
-          Body.fromString(user.toJson),
-          url = URL.decode(s"http://${config.host}:${config.port}/user").getOrElse(URL.empty)
+          url = URL
+            .decode(s"http://${config.host}:${config.port}/user")
+            .getOrElse(URL.empty),
+          Body.fromString(user.toJson)
         )
       )
   yield resp

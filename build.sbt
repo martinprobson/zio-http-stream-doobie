@@ -1,14 +1,14 @@
 name := "zio with zio-http, zio-streams and doobie example"
-ThisBuild / scalaVersion := "3.3.1"
+ThisBuild / scalaVersion := "3.3.4"
 ThisBuild / version := "0.0.1-SNAPSHOT"
 ThisBuild / organization := "net.martinprobson.example"
 
-val zioVersion            = "2.0.22"
+val zioVersion            = "2.1.14"
 val zioConnectFileVersion = "0.4.4"
-val zioLoggingVersion     = "2.2.3"
-val zioHttpVersion        = "3.0.0-RC2"
-val zioJsonVersion        = "0.6.2"
-val zioConfigVersion      = "4.0.0-RC12"
+val zioLoggingVersion     = "2.4.0"
+val zioHttpVersion        = "3.0.1"
+val zioJsonVersion        = "0.7.3"
+val zioConfigVersion      = "4.0.2"
 val logbackVersion        = "1.4.6"
 
 val commonDependencies = Seq(
@@ -23,8 +23,8 @@ val commonDependencies = Seq(
   "dev.zio" %% "zio-config-magnolia" % zioConfigVersion,
   "dev.zio" %% "zio-config-typesafe" % zioConfigVersion,
   // Logging
-  "ch.qos.logback" % "logback-classic" % "1.5.6",
-  "ch.qos.logback" % "logback-core" % "1.5.6",
+  "ch.qos.logback" % "logback-classic" % "1.5.12",
+  "ch.qos.logback" % "logback-core" % "1.5.12",
   // Testing
   "dev.zio" %% "zio-test" % zioVersion % Test,
   "dev.zio" %% "zio-test-sbt" % zioVersion  % Test
@@ -81,15 +81,15 @@ lazy val server = project
     commonDependencies ++
     Seq("dev.zio" %% "zio-http" % zioHttpVersion,
         // Doobie
-        "org.tpolecat" %% "doobie-core" % "1.0.0-RC1",
-        "org.tpolecat" %% "doobie-hikari" %  "1.0.0-RC1",
+        "org.tpolecat" %% "doobie-core" % "1.0.0-RC6",
+        "org.tpolecat" %% "doobie-hikari" %  "1.0.0-RC6",
         // CATS / Zio interop
-        "dev.zio" %% "zio-interop-cats" % "23.1.0.2",
+        "dev.zio" %% "zio-interop-cats" % "23.1.0.3",
         // Logging (Cats)
-        "org.typelevel" %% "log4cats-slf4j" % "2.6.0",
+        "org.typelevel" %% "log4cats-slf4j" % "2.7.0",
         // Logging
-        "ch.qos.logback" % "logback-classic" % "1.5.6",
-        "ch.qos.logback" % "logback-core" % "1.5.6",
+        "ch.qos.logback" % "logback-classic" % "1.5.12",
+        "ch.qos.logback" % "logback-core" % "1.5.12",
         // Db Drivers
         "mysql" % "mysql-connector-java" % "8.0.33",
         "com.h2database" % "h2" % "1.4.200")

@@ -16,10 +16,10 @@ import zio.connect.file.*
 import User.*
 import net.martinprobson.example.zio.files.FileSource
 
-object Main extends ZIOApplication {
+object Main extends ZIOApplication:
 
   private val program: ZIO[UserClient & Source, Throwable, Unit] =
-  // FileSource.stream.mapZIOParUnordered(4)(user => UserClient.addUser(user)).runDrain
+    // FileSource.stream.mapZIOParUnordered(4)(user => UserClient.addUser(user)).runDrain
     Source.stream
       .mapZIOParUnordered(Int.MaxValue)(user => UserClient.addUser(user))
       .runDrain
@@ -27,9 +27,9 @@ object Main extends ZIOApplication {
   override def run: Task[Unit] = program.provide(
     UserClientLive.layer,
     Client.default,
-    MemorySource(50).layer
+    MemorySource(50000).layer
   )
   //    fileConnectorLiveLayer,
   //    Scope.default)
 
-}
+end Main

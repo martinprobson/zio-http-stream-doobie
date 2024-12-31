@@ -12,7 +12,7 @@ import zio.test.Assertion.*
 
 object UserAppTest extends ZIOTestApplication:
 
-  private val app = UserApp()
+  private val app = UserApp.routes.handleError(_ => Response.error(Status.InternalServerError))
 
   def spec: Spec[TestEnvironment with Scope, Any] = suiteAll("UserAppTest") {
     val users = Range(1, 20).inclusive.toList
@@ -21,17 +21,15 @@ object UserAppTest extends ZIOTestApplication:
     val user = users.head
 
     test("addUser") {
-      val path = Root / "user"
-      val req =
-        Request.post(body = Body.fromString(user.toJson), url = URL(path))
-      for actualBody <- app.runZIO(req).flatMap(_.body.asString)
+      val req = Request.post(toURL("user"), Body.fromString(user.toJson))
+      for 
+        actualBody <- app.runZIO(req).flatMap(_.body.asString)
+        _ <- ZIO.logInfo(s"actualBody = $actualBody")
       yield assertTrue(actualBody.fromJson[User] == Right(user.copy(id = 1)))
     }
 
     test("addUsers") {
-      val path = Root / "users"
-      val req =
-        Request.post(body = Body.fromString(users.toJson), url = URL(path))
+      val req = Request.post(toURL("users"), Body.fromString(users.toJson))
       for actualBody <- app.runZIO(req).flatMap(_.body.asString)
       yield assert(actualBody.fromJson[List[User]])(
         isRight(hasSize(equalTo(users.size)))
@@ -39,9 +37,8 @@ object UserAppTest extends ZIOTestApplication:
     }
 
     test("getUsers - empty") {
-      val path = Root / "users"
       app
-        .runZIO(Request.get(url = URL(path)))
+        .runZIO(Request.get(toURL("users")))
         .flatMap(_.body.asString)
         .flatMap(body =>
           assert(body.fromJson[List[User]])(isRight(hasSize(equalTo(0))))
@@ -49,10 +46,9 @@ object UserAppTest extends ZIOTestApplication:
     }
 
     test("getUsers - not empty") {
-      val path = Root / "users"
-      val req = Request.get(url = URL(path))
+      val req = Request.get(toURL("users"))
       val addUsersReq =
-        Request.post(body = Body.fromString(users.toJson), url = URL(path))
+        Request.post(toURL("users"), Body.fromString(users.toJson))
       for
         _ <- app.runZIO(addUsersReq)
         actualBody <- app.runZIO(req).flatMap(_.body.asString)
@@ -62,12 +58,11 @@ object UserAppTest extends ZIOTestApplication:
     }
 
     test("getUser - (user exists)") {
-      val path = Root / "user" / "4"
-      val req = Request.get(url = URL(path))
+      val req = Request.get(toURL("user/4"))
       val addUsersReq =
         Request.post(
-          body = Body.fromString(users.toJson),
-          url = URL(Root / "users")
+          toURL("users"),
+          Body.fromString(users.toJson)
         )
       for
         _ <- app.runZIO(addUsersReq)
@@ -78,31 +73,32 @@ object UserAppTest extends ZIOTestApplication:
     }
 
     test("getUser - (user does not exist)") {
-      val path = Root / "user" / "4"
-      val req = Request.get(url = URL(path))
+      val req = Request.get(toURL("user/4"))
       for resp <- app.runZIO(req)
       yield assertTrue(resp.status == Status.NotFound)
     }
 
     test("count users - (empty database)") {
-      val path = Root / "users" / "count"
-      val req = Request.get(url = URL(path))
+      val req = Request.get(toURL("users/count"))
       for actualBody <- app.runZIO(req).flatMap(_.body.asString)
       yield assertTrue(actualBody == "0")
     }
 
     test("count users - (non-empty database)") {
-      val path = Root / "users" / "count"
-      val req = Request.get(url = URL(path))
+      val req = Request.get(toURL("users/count"))
       val addUsersReq =
         Request.post(
-          body = Body.fromString(users.toJson),
-          url = URL(Root / "users")
+          toURL("users"),
+          Body.fromString(users.toJson)
         )
       for
         _ <- app.runZIO(addUsersReq)
         actualBody <- app.runZIO(req).flatMap(_.body.asString)
       yield assertTrue(actualBody == users.size.toString)
     }
-//TODO test for count
   }.provide(InMemoryUserRepository.layer)
+  
+  private def toURL(url: String): URL = URL.decode(url).getOrElse(URL.empty)
+
+end UserAppTest
+

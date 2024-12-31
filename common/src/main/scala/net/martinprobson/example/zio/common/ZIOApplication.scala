@@ -30,5 +30,5 @@ trait ZIOApplication extends ZIOAppDefault {
     */
   override val bootstrap: ZLayer[ZIOAppArgs, Any, Any] =
     Runtime.removeDefaultLoggers >>> SLF4J.slf4j(logFormat) >>>
-      Runtime.setConfigProvider(TypesafeConfigProvider.fromResourcePath)
+      Runtime.setConfigProvider(TypesafeConfigProvider.fromResourcePath())
 }

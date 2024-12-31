@@ -23,6 +23,6 @@ trait ZIOTestApplication extends ZIOSpecDefault {
     */
   override val bootstrap: ZLayer[Any, Any, TestEnvironment] =
     Runtime.removeDefaultLoggers >>> SLF4J.slf4j(logFormat) >>>
-      Runtime.setConfigProvider(TypesafeConfigProvider.fromResourcePath) >>>
+      Runtime.setConfigProvider(TypesafeConfigProvider.fromResourcePath()) >>>
       testEnvironment
 }
